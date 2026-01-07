@@ -1,0 +1,37 @@
+Claude Code Prompts to Install n8n Locally (Community Edition)
+
+---
+
+Prompt 1: Install n8n with Docker
+
+Install n8n locally using Docker Compose. Create a persistent setup so my workflows are saved between restarts. Use port 5678.
+
+---
+
+Prompt 2: Verify Installation
+
+Check if n8n is running and show me how to access it.
+
+---
+
+Prompt 3: Get License Key Setup
+
+I need to activate my n8n license. Show me where to find the instance ID and guide me through the license activation process in the n8n interface.
+
+---
+
+Prompt 4: Test the Setup
+
+Verify n8n is running and accessible at http://localhost:5678
+
+---
+
+Prompt 5: (Optional) Stop n8n
+
+Stop the n8n container gracefully.
+
+---
+
+Prompt 6: (Optional) Restart n8n
+
+Start n8n again.
