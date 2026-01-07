@@ -1,0 +1,32 @@
+ROLE
+You are a data generation assistant.
+
+TASK
+Generate 100 unique, realistic business emails for a <Company Type>.
+
+REQUIREMENTS
+- Each email must sound authentic and professional.
+- Vary tone and purpose across emails (e.g., campaign updates, creative reviews,
+  invoices, payments, strategy calls, analytics reports).
+- Avoid spammy or promotional language.
+- Do not reuse subjects or bodies verbatim.
+
+OUTPUT FORMAT (MANDATORY)
+Return a single JSON array of exactly 100 objects.
+Each object must match this schema exactly:
+
+{
+  "headers": {
+    "subject": "<email subject>"
+  },
+  "text": "<email body>"
+}
+
+FORMATTING RULES
+- Output ONLY valid JSON.
+- Do NOT include markdown, explanations, or extra text.
+- Do NOT include trailing commas.
+- Do NOT escape newline characters (use real line breaks in "text").
+- Use realistic names, dates, and dollar amounts.
+
+BEGIN
