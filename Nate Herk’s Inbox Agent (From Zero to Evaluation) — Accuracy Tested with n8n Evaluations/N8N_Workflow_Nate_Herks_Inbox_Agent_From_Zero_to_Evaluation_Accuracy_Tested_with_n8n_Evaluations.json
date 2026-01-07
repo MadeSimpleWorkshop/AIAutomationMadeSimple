@@ -1,0 +1,1300 @@
+{
+  "name": "Evaluation -> From Zero to Inbox Agent (Nate Herk)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        1488
+      ],
+      "id": "822b7919-2a89-4095-9eef-9c3a17197ca9",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Subject: {{ $json.headers.subject }}\n\nBody: {{ $json.text }}\n",
+        "categories": {
+          "categories": [
+            {
+              "category": "Customer Support",
+              "description": "=Emails requesting help, troubleshooting, or guidance for a product or service. Usually describe issues like login errors, bugs, or malfunctioning features. Common keywords: error, issue, problem, help, access, support, fix, reset, troubleshoot."
+            },
+            {
+              "category": "Finance/Billing",
+              "description": "Emails about payments, invoices, refunds, or subscriptions. The sender wants to confirm, dispute, or update financial details. Common keywords: invoice, payment, refund, billing, charge, subscription, renewal, receipt."
+            },
+            {
+              "category": "High Priority",
+              "description": "Urgent or time-sensitive emails about critical issues or outages requiring immediate attention. Common keywords: urgent, ASAP, critical, outage, down, immediate, emergency, escalation."
+            },
+            {
+              "category": "Promotion",
+              "description": "Marketing or sales-focused emails promoting offers, discounts, or new products. Tone is upbeat and persuasive. Common keywords: sale, offer, discount, promotion, new feature, upgrade, limited time, exclusive."
+            },
+            {
+              "category": "Unknown",
+              "description": "Emails that do not clearly fit Customer Support, Finance/Billing, High Priority, or Promotion. Includes neutral or informational messages such as product announcements without offers, general updates, newsletters without calls to action, internal or FYI communications, and messages where intent is unclear or ambiguous. Use this category only when no other category confidently applies."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        1264
+      ],
+      "id": "4b78cef9-5b09-403d-b0e2-4a0ae2e49b99",
+      "name": "Text Classifier",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "content": "## Evaluation Trigger\n",
+        "height": 288,
+        "width": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        1216
+      ],
+      "id": "836728be-43bd-45d0-ba21-c924604e6f85",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "d0c8juCtQ72dpYcs",
+          "mode": "list",
+          "cachedResultName": "advertising_firm_emails_scored",
+          "cachedResultUrl": "/projects/fxNKuYZbs3uc6DKZ/datatables/d0c8juCtQ72dpYcs"
+        }
+      },
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        1328
+      ],
+      "id": "fb701c8e-3aef-46d7-9d18-262760fda6bb",
+      "name": "When fetching a dataset row",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "152b696a-faba-4def-ba85-bf3f366dfbbb",
+              "name": "headers.subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "153fdf23-134f-411e-a23e-beca89d8b407",
+              "name": "text",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        1328
+      ],
+      "id": "575df815-ae67-4fff-828d-26a6ebedc8a1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "id"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        512,
+        1632
+      ],
+      "id": "ecbc8d06-2a4d-4004-be48-29e7727fb412",
+      "name": "OpenAI Chat Model - gpt-4.1-mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "kgZmR6PKAMyUXvHO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75ac6dc5-3ef4-4776-a8ed-147e5c69d84b",
+              "name": "actual_label",
+              "value": "Promotion",
+              "type": "string"
+            },
+            {
+              "id": "852d90ca-68d5-4f5f-b92f-3cf4575564a2",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c6777b19-e4e8-411f-8679-64c8b47c16d1",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "f952e08c-9b3a-4764-a52f-d4b1eae2a4c1",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "74d8178c-e3b3-4930-8cbd-6590647d41d6",
+              "name": "expected_label",
+              "value": "={{ $json.expected_label }}",
+              "type": "string"
+            },
+            {
+              "id": "59613b44-4d5d-4b96-b329-f9bdef2a073d",
+              "name": "expected_confidence_min",
+              "value": "={{ $json.expected_confidence_min }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        1664
+      ],
+      "id": "3921a3cc-7e90-4a9e-8443-214a3aeb4495",
+      "name": "Set Promotion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75ac6dc5-3ef4-4776-a8ed-147e5c69d84b",
+              "name": "actual_label",
+              "value": "High Priority",
+              "type": "string"
+            },
+            {
+              "id": "861210a1-9a69-41ac-b1c3-1090965abf55",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "ae54a44b-0320-4205-8575-669fa017bdb8",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "5bebc1c9-c7f2-43a6-9553-9f1212e9903e",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b35c42c5-558f-475c-8c42-ecf5a3947cf8",
+              "name": "expected_label",
+              "value": "={{ $json.expected_label }}",
+              "type": "string"
+            },
+            {
+              "id": "edb3e39d-a88b-441f-a4d7-a229db64ee8e",
+              "name": "expected_confidence_min",
+              "value": "={{ $json.expected_confidence_min }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        1472
+      ],
+      "id": "23031646-7daf-4bb1-8b23-6728f237f242",
+      "name": "Set High Priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75ac6dc5-3ef4-4776-a8ed-147e5c69d84b",
+              "name": "actual_label",
+              "value": "Finance/Billing",
+              "type": "string"
+            },
+            {
+              "id": "c3b1919a-13e4-4f17-8151-e7523ebbfd4c",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "6c637749-8012-4ae0-9e7e-54fe6a4389c4",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "b57a6e62-edb8-4b54-9c87-b08691c68e87",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2ac9c308-9a2f-4205-a2c2-260ad725e092",
+              "name": "expected_label",
+              "value": "={{ $json.expected_label }}",
+              "type": "string"
+            },
+            {
+              "id": "5cf69723-5e59-48e9-8cdc-f35fc9a8569b",
+              "name": "expected_confidence_min",
+              "value": "={{ $json.expected_confidence_min }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        1280
+      ],
+      "id": "392957c3-4a81-43de-a776-543f5fcf322c",
+      "name": "Set Finance/Billing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75ac6dc5-3ef4-4776-a8ed-147e5c69d84b",
+              "name": "actual_label",
+              "value": "Customer Support",
+              "type": "string"
+            },
+            {
+              "id": "8f418588-70ad-4a82-a57e-e519978e12a8",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "03a1860e-6332-4beb-9644-2ab524ab37d3",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "79c62835-1a0c-4df8-bcd8-616a4dd7ae19",
+              "name": "expected_label",
+              "value": "={{ $json.expected_label }}",
+              "type": "string"
+            },
+            {
+              "id": "1f484172-9895-4c92-8af6-b4ea8c91a00e",
+              "name": "expected_confidence_min",
+              "value": "={{ $json.expected_confidence_min }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        1088
+      ],
+      "id": "91789d7e-a312-40b8-81e4-5f0d6e12f2c5",
+      "name": "Set Customer Support"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75ac6dc5-3ef4-4776-a8ed-147e5c69d84b",
+              "name": "actual_label",
+              "value": "Unknown",
+              "type": "string"
+            },
+            {
+              "id": "852d90ca-68d5-4f5f-b92f-3cf4575564a2",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "c6777b19-e4e8-411f-8679-64c8b47c16d1",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "f952e08c-9b3a-4764-a52f-d4b1eae2a4c1",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "74d8178c-e3b3-4930-8cbd-6590647d41d6",
+              "name": "expected_label",
+              "value": "={{ $json.expected_label }}",
+              "type": "string"
+            },
+            {
+              "id": "59613b44-4d5d-4b96-b329-f9bdef2a073d",
+              "name": "expected_confidence_min",
+              "value": "={{ $json.expected_confidence_min }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        1856
+      ],
+      "id": "069161d2-56ce-47b1-89d5-a762c96d6864",
+      "name": "Set Unknown"
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1488,
+        1264
+      ],
+      "id": "a8ec9368-aa88-4c19-829b-fb575daf854e",
+      "name": "Merge - actual_label"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "d0c8juCtQ72dpYcs",
+          "mode": "list",
+          "cachedResultName": "advertising_firm_emails_scored",
+          "cachedResultUrl": "/projects/fxNKuYZbs3uc6DKZ/datatables/d0c8juCtQ72dpYcs"
+        },
+        "outputs": {
+          "values": [
+            {
+              "outputName": "actual_label",
+              "outputValue": "={{ $json.actual_label }}"
+            },
+            {
+              "outputName": "model",
+              "outputValue": "gpt-4.1-mini"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        1648,
+        1312
+      ],
+      "id": "f2a242ca-b8f7-4940-8239-a128304933e6",
+      "name": "Evaluation",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "checkIfEvaluating"
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        960,
+        1088
+      ],
+      "id": "b88b8004-6f53-46a0-a9f1-37596a6be018",
+      "name": "Evaluation - Customer Support1"
+    },
+    {
+      "parameters": {
+        "operation": "checkIfEvaluating"
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        960,
+        1296
+      ],
+      "id": "e586e6ee-66da-4f13-a592-06a423c88e34",
+      "name": "Evaluation - Finance/Billing1"
+    },
+    {
+      "parameters": {
+        "operation": "checkIfEvaluating"
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        960,
+        1872
+      ],
+      "id": "20841055-3294-4762-b956-b0d8b24667d7",
+      "name": "Evaluation - Unknown1"
+    },
+    {
+      "parameters": {
+        "operation": "checkIfEvaluating"
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        960,
+        1664
+      ],
+      "id": "c4e4792f-dd8c-4585-9a3d-7e0d69670426",
+      "name": "Evaluation - Promotion1"
+    },
+    {
+      "parameters": {
+        "operation": "checkIfEvaluating"
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        960,
+        1472
+      ],
+      "id": "b0c85c01-3398-4fa2-b84b-dc1a5c545ba2",
+      "name": "Evaluation - High Priority1"
+    },
+    {
+      "parameters": {
+        "content": "## Create Data Set ",
+        "height": 240,
+        "width": 464,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "2c2c1ee7-7463-4b8b-8305-d37f9a5d8cb3",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "setMetrics",
+        "metric": "categorization",
+        "expectedAnswer": "={{ $('When fetching a dataset row').item.json.expected_label }}",
+        "actualAnswer": "={{ $json.actual_label }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        2000,
+        1312
+      ],
+      "id": "6f79bc22-df1a-482d-9c79-08cdf6962e4b",
+      "name": "Evaluation1"
+    },
+    {
+      "parameters": {
+        "operation": "setInputs",
+        "inputs": {
+          "values": [
+            {
+              "inputName": "expected_label",
+              "inputValue": "={{ $('When fetching a dataset row').item.json.expected_label }}"
+            },
+            {
+              "inputName": "expected_confidence_min",
+              "inputValue": "={{ $('When fetching a dataset row').item.json.expected_confidence_min }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.evaluation",
+      "typeVersion": 4.8,
+      "position": [
+        1840,
+        1312
+      ],
+      "id": "458d9fa1-bb98-4e51-8106-f9e80be87b91",
+      "name": "Evaluation2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "RlXBTb97Eugh3vBg",
+          "mode": "list",
+          "cachedResultName": "scored_emails_gpt52_electric_company",
+          "cachedResultUrl": "/projects/fxNKuYZbs3uc6DKZ/datatables/RlXBTb97Eugh3vBg"
+        },
+        "limit": null
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        880
+      ],
+      "id": "4b255d43-5a38-4faa-947d-81a72250d878",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "content": "## Evaluation Setup and Scoring",
+        "height": 320,
+        "width": 800,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1424,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "ba6dff98-3156-4b61-9d9a-9a4e85db811a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Check if Evaluation",
+        "height": 1168,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "f83a7cbc-d608-4459-8cf4-23ba01bf7833",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "##  Production Nodes",
+        "height": 1184,
+        "width": 1056
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        1584
+      ],
+      "typeVersion": 1,
+      "id": "eb489234-f3cc-41f4-ac8c-868dbfd73888",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Export Any Datatable to Json",
+        "height": 240,
+        "width": 336,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        48,
+        784
+      ],
+      "id": "8a758945-eb56-45b5-8024-55d628e74762",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        576
+      ],
+      "id": "6d9902d5-9f55-4336-bc0c-8c8bdc6950ba",
+      "name": "Convert to CSV for Datatable1"
+    },
+    {
+      "parameters": {
+        "content": "## Create Customer Data Set",
+        "height": 240,
+        "width": 640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "1b873e61-e98f-4328-a685-18cbc4bcf614",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        304
+      ],
+      "id": "ed64080e-b0a0-40f9-b45d-bec8cec9fa3b",
+      "name": "Get many messages",
+      "webhookId": "c3ff8f46-f844-47b9-aebb-c671e86c7399",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "152b696a-faba-4def-ba85-bf3f366dfbbb",
+              "name": "headers.subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "153fdf23-134f-411e-a23e-beca89d8b407",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        304
+      ],
+      "id": "58300d00-9b19-4663-ae26-4fac57166b7a",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        304
+      ],
+      "id": "5179a1f8-c0bc-4163-9487-3b35c0872963",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "##  Production Nodes",
+        "height": 640,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "75abdeb3-e23f-4ac8-8916-1de648c8defd",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "=gpt-5.2-chat-latest",
+          "mode": "id"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        1632
+      ],
+      "id": "c0c26df3-c84a-4de1-ad19-835f6b7e15ef",
+      "name": "OpenAI Chat Model - gpt-5.2-chat-latest",
+      "credentials": {
+        "openAiApi": {
+          "id": "kgZmR6PKAMyUXvHO",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Your full JSON array pasted here\nconst data = \n[\n{\n\"unique_id\": \"email-001\",\n\"subject\": \"Domains from just $0.98 in our New Year Sale\",\n\"body\": \"Namecheap Save big on everything you need to bring your idea to life online in \\n2026!  ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   \\n͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ \\n‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌ \\n  ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   \\n͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ \\n‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌ \\n  ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   ͏ ‌   \\n…\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.99,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-002\",\n\"subject\": \"Babylon, this could be your vibe\",\n\"body\": \"To view this content open the following URL in your browser: [https://www.pinterest.com/email/click/?user_id=NzM1NjM1MDU3NzkxOTIwNzYx&od=dD04NzJkOTcxNTJhNDg0NjVmOTg2OWQxMWE5YzQ3YmEyNiZjPUhPTUVGRUVEX0RJR0VTVF9QSU5TJnM9ODcyZDk3MTUyYTQ4NDY1Zjk4NjlkMTFhOWM0N2JhMjYmbj0zMDcyNDg2NWE5ODU0ODcyODgxMjAxM2Y1YjcwYmUwOA%3D%3D&target=https%3A%2F%2Fwww.pinterest.com%2Fsecure%2Fautologin%2F%3Fuser_id%3DNzM1NjM1MDU3NzkxOTIwNzYx%26od%3DDWyTOazqTiQRsGdMQRzBGLMqC5fyy8tyzd07e0cf5eqPkVMsBjHfXmPNi4W5LT5HjB5sCj%252B7zkM8BEZKkyY%252FFb9FLvrPK6JWXBsnWqgpKgKoJOBDUcvy5SjgipH5nrr4VsgQ0DEU9P19BFzlj%252Byl%252FQ%253D%253D%26next%3D%252F%253Futm_campaign%253Dhfdigestpins%2526e_t%253D872d97152a48465f9869d11a9c47ba26%2526e_t_s%253Dcta%2526utm_source%253D31%2526utm_medium%253D2004](https://www.pinterest.com/email/click/?user_id=NzM1NjM1MDU3NzkxOTIwNzYx&od=dD04NzJkOTcxNTJhNDg0NjVmOTg2OWQxMWE5YzQ3YmEyNiZjPUhPTUVGRUVEX0RJR0VTVF9QSU5TJnM9ODcyZDk3MTUyYTQ4NDY1Zjk4NjlkMTFhOWM0N2JhMjYmbj0zMDcyNDg2NWE5ODU0ODcyODgxMjAxM2Y1YjcwYmUwOA%3D%3D&target=https%3A%2F%2Fwww.pinterest.com%2Fsecure%2Fautologin%2F%3Fuser_id%3DNzM1NjM1MDU3NzkxOTIwNzYx%26od%3DDWyTOazqTiQRsGdMQRzBGLMqC5fyy8tyzd07e0cf5eqPkVMsBjHfXmPNi4W5LT5HjB5sCj%252B7zkM8BEZKkyY%252FFb9FLvrPK6JWXBsnWqgpKgKoJOBDUcvy5SjgipH5nrr4VsgQ0DEU9P19BFzlj%252Byl%252FQ%253D%253D%26next%3D%252F%253Futm_campaign%253Dhfdigestpins%2526e_t%253D872d97152a48465f9869d11a9c47ba26%2526e_t_s%253Dcta%2526utm_source%253D31%2526utm_medium%253D2004)\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.96,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-003\",\n\"subject\": \"Start 2026 strong. Save on it all: $50/yr.\",\n\"body\": \"Make the most of the new year with unlimited access to the complete Times experience: News, Games, Cooking, Wirecutter, The Athletic and more.\\n\\n-- The New York Times --\\n\\nReady to reset? We've got you covered.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.97,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-004\",\n\"subject\": \"Save Over $50 on last-minute stays for MLK weekend\",\n\"body\": \"Save over $50 on last-minute stays. Make the most of the long weekend with a last-minute ski escape. Find cabins, condos, and chalets close to the lifts.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.98,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-005\",\n\"subject\": \"⏰ 1 day left! | Pro audio deals from $29 ⏰\",\n\"body\": \"Time’s running out to treat your tracks. Deals from $29 – gone tomorrow! You’ve only got 1 day left to catch deals on top tools, bundles, and effects.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.99,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-006\",\n\"subject\": \"🎥CES 2026 Live: Join xTool’s Innovation Hub Tour\",\n\"body\": \"To view the graphic version (HTML) of this e-mail, click on the following link or copy it into your browser.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.95,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-007\",\n\"subject\": \"Create Visuals That Feel Like a Movie Scene 😎\",\n\"body\": \"Upload an image, paste a prompt, and watch Nano Banana bring it to life in seconds.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.97,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-008\",\n\"subject\": \"⏰ 1 day left! | Deals from $29 ⏰\",\n\"body\": \"Time’s running out to treat your tracks. 1 day left to save big with special loyalty offers.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.99,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-009\",\n\"subject\": \"Don't Miss Out On 10 Percent Savings!\",\n\"body\": \"Just a quick reminder: our Year-End discounts wrap up today. Enjoy 10 percent markdowns on bundles, gateways, modules, and accessories.\",\n\"expected_label\": \"Promotion\",\n\"expected_confidence_min\": 0.98,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n},\n{\n\"unique_id\": \"email-010\",\n\"subject\": \"Smart Monitoring Alert\",\n\"body\": \"Dry Room humidity Alert\\n\\nReading:\\n\\nDry Room humidity is 56.6% exceeds min threshold 58%\\n\\nDate:\\n\\nJan 6, 2026, 5:05:04 AM\",\n\"expected_label\": \"Customer Support\",\n\"expected_confidence_min\": 0.90,\n\"actual_label\": null,\n\"model\": \"chatgpt-5.2\"\n}\n]\n\n\n\n;\n\n// Convert array of objects into n8n items\nreturn data.map(entry => ({ json: entry }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        576
+      ],
+      "id": "dc7ae535-19b2-4e18-be1b-46631b06aad5",
+      "name": "Create DataSet"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        1872
+      ],
+      "id": "2d3482d9-9f3d-4d37-ac05-fd12ca562a37",
+      "name": "Send a message",
+      "webhookId": "8c68dceb-a8c0-475f-b631-f8981d67766b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        1680
+      ],
+      "id": "8486ef31-ef5b-433b-ac30-f2b6f8dfda2a",
+      "name": "Send a message2",
+      "webhookId": "8c68dceb-a8c0-475f-b631-f8981d67766b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        2096
+      ],
+      "id": "ca2f767c-5054-4a4a-981f-f84cf56778ab",
+      "name": "Send a message3",
+      "webhookId": "8c68dceb-a8c0-475f-b631-f8981d67766b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        2304
+      ],
+      "id": "a38b7452-c35f-4f64-ab1f-3672f5cbe176",
+      "name": "Send a message4",
+      "webhookId": "8c68dceb-a8c0-475f-b631-f8981d67766b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        2512
+      ],
+      "id": "450feabe-f418-4f43-87df-2a39a9e4ee29",
+      "name": "Send a message5",
+      "webhookId": "8c68dceb-a8c0-475f-b631-f8981d67766b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8tITE8ser7v7ahX1",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "19b8bbb16c44a377",
+          "threadId": "19b8bbb16c44a377",
+          "labelIds": [
+            "UNREAD",
+            "IMPORTANT",
+            "CATEGORY_UPDATES",
+            "INBOX"
+          ],
+          "sizeEstimate": 13825,
+          "headers": {
+            "delivered-to": "Delivered-To: ghostspieces@gmail.com",
+            "received": "Received: from mail-sor-f73.google.com (mail-sor-f73.google.com. [209.85.220.73])\r\n        by mx.google.com with SMTPS id 46e09a7af769-7cc59b851fesor13200292a34.14.2026.01.04.17.17.32\r\n        for <ghostspieces@gmail.com>\r\n        (Google Transport Security);\r\n        Sun, 04 Jan 2026 17:17:32 -0800 (PST)",
+            "x-received": "X-Received: by 2002:a05:6820:1517:b0:65f:1038:1315 with SMTP id\r\n 006d021491bc7-65f103814b0mr6177966eaf.28.1767575852446; Sun, 04 Jan 2026\r\n 17:17:32 -0800 (PST)",
+            "arc-seal": "ARC-Seal: i=1; a=rsa-sha256; t=1767575852; cv=none;\r\n        d=google.com; s=arc-20240605;\r\n        b=iM4w66NHdCfGCzNB+LQJd6nTJYGky2fs9cDtRxvz2Mqh80dk9HlHBtSdZLJ610ievo\r\n         fLp85M63fcsntp/JB/Ruqou5VWQQ7MnC0NbGw/WoOYDi49SQyDBFLpbqpfQj9rgzCMLY\r\n         ib1kR7CEJa4WuepvH97QuAxnXMpuxmgIeOMCqM9SwTcRUIkD6V6Br5+80ZyPtuNO/N2V\r\n         f5l0cg9lAquRf2fhDbAdqa6PQoytbqpG+49r7lV4YlabKyKUUToD8L8l4bROZD9d6xIE\r\n         2752luOR14rsZQ2VMR7CLnxFvezp9CP/8RmbhUmoK2Te5JT1Ruba0nelwfurE9PhAwqx\r\n         uqQg==",
+            "arc-message-signature": "ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;\r\n        h=to:from:subject:message-id:gmsai:feedback-id:date:mime-version\r\n         :dkim-signature;\r\n        bh=9fcm7Fkoq0IEfLXnFQZ7tOTvXEMNwbXGXpxPtSdmdVM=;\r\n        fh=jEONYSGtUjN2EQHfYC5QVGtE4muZYnF2wR5z4uRqODU=;\r\n        b=jCNePvBlctVWM7RW/30z/F6qiztvq0aZWt3yzku6Dn1Jeqo6b0dTR3UWU3Z47VSX/l\r\n         ZTnSrV7IQR4+nMzRWCVOU5JBbMjEcYtXy8G93Y/K9Zoj5cNT786caq2ip/x5EZFICvV6\r\n         dWsOiGKx9B/HUmYia8sTbmgFqxmJMhlgohv272c/NFVV7vIFwStHXTwB0yAEgCmthjVg\r\n         XyqmHwNOur1LKVJxGdEyRSADF8LsH7lcjq+nO7b+NLZMJU3J/9orJK/NjrZIaO3DFvIf\r\n         yFkMJJjs8swng8uLRhes/C7OjnmFfidSMPNvmK1H7S1G/oFfOwDVg3nEFtJoIM+bn7Qy\r\n         icWw==;\r\n        dara=google.com",
+            "arc-authentication-results": "ARC-Authentication-Results: i=1; mx.google.com;\r\n       dkim=pass header.i=@accounts.google.com header.s=20230601 header.b=R858mJtY;\r\n       spf=pass (google.com: domain of 3lbfbaqgtda001-4r2ybnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=3LBFbaQgTDA001-4r2yBnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=accounts.google.com;\r\n       dara=pass header.i=@gmail.com",
+            "return-path": "Return-Path: <3LBFbaQgTDA001-4r2yBnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com>",
+            "received-spf": "Received-SPF: pass (google.com: domain of 3lbfbaqgtda001-4r2ybnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) client-ip=209.85.220.73;",
+            "authentication-results": "Authentication-Results: mx.google.com;\r\n       dkim=pass header.i=@accounts.google.com header.s=20230601 header.b=R858mJtY;\r\n       spf=pass (google.com: domain of 3lbfbaqgtda001-4r2ybnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com designates 209.85.220.73 as permitted sender) smtp.mailfrom=3LBFbaQgTDA001-4r2yBnpp17065.t11tyr.p1ztu15652vrpr5tznvy.p1z@gaia.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=accounts.google.com;\r\n       dara=pass header.i=@gmail.com",
+            "dkim-signature": "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=accounts.google.com; s=20230601; t=1767575852; x=1768180652; dara=google.com;\r\n        h=to:from:subject:message-id:gmsai:feedback-id:date:mime-version:from\r\n         :to:cc:subject:date:message-id:reply-to;\r\n        bh=9fcm7Fkoq0IEfLXnFQZ7tOTvXEMNwbXGXpxPtSdmdVM=;\r\n        b=R858mJtYatvjne6mR3Xwo+HUNfiQM/bAnCuFcLrdRxtBwQd5itbP9J7OdEglnkuOf5\r\n         2ng7ujwSV2dBG2zGNepGvbzRHUYVje6RZyzSNKOgdyL3HLZIeWiDP3iTRO4Fkg1nN8Wy\r\n         j8raAlTL2DytY4mmep2CJCJXvkeGfuCzPWzbRQHl2P1jN+yuTXoEVh3cq5bj40+1OYIr\r\n         +fAs7v/ljX/05kuB+15kpGktcHFfoz7H/u4Do91sjjc7WopwxKl93L4BKaTQNrjrcA39\r\n         Z3OhuB8RFghB/t0N6hFNZz7s03E5xW28wdajhqRqj/6ygNQaxQvjVpc6VitxIaTCEqHS\r\n         mrmw==",
+            "x-google-dkim-signature": "X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20230601; t=1767575852; x=1768180652;\r\n        h=to:from:subject:message-id:gmsai:feedback-id:date:mime-version\r\n         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;\r\n        bh=9fcm7Fkoq0IEfLXnFQZ7tOTvXEMNwbXGXpxPtSdmdVM=;\r\n        b=L0QugqIgJMULAbc8RhdDi2gTTP7SIE6AUUn8tY8KK7olvMb/O3nysBb74ZgTtRECWl\r\n         U4Fyk7WoYClocvitsTvWRXKwUfc80d0SZ6lYU9ZrthF26LkD1ur/WSHYalbntgQSGBs3\r\n         niZUMA/77ZEYa5hE7p7JmBGhSyRgZkrNRb2Evjgu33rcez2cqRwd9lvzXSLu5XIRWzAn\r\n         wqaXCMb4X4cvGIPUeReShpe2eCDiznUxhGTeqPq5mD1xzIdlz/ooKeeP0sj1Iv09+v4Z\r\n         IibqqBYNqa0EXfZWNqFshpedpemO42wqcdGDtBrXDEqi97v5I3LCab9Ta48m9pxXqGF3\r\n         pgDA==",
+            "x-gm-message-state": "X-Gm-Message-State: AOJu0YxbjKjLA/HfhKONE142rZK1Cq/1NLzvdj8GvTLU6h0OZeXeBS9r\r\n\taowNBTiLQv+xH3YW5Sw4mHf/Ic9owmb8TdFxc4m7jcKfNmpnHErQ2LmT/e1GZ5K5PYA9z6wLqbv\r\n\tPKNZ4S273nnXUCVRuVCZ7TcfVJ1aU9dZOStKHIus=",
+            "x-google-smtp-source": "X-Google-Smtp-Source: AGHT+IFNPJQqHnhM+ia6j6wpM7eXlYaUZsPHDxEk5eYDvBNFymZJ6V8d3X2HJdHTzYiRRRUV8NMi5nrRlH2RTvBZO5wFeQ==",
+            "mime-version": "MIME-Version: 1.0",
+            "date": "Date: Mon, 05 Jan 2026 01:17:31 GMT",
+            "x-account-notification-type": "X-Account-Notification-Type: 127",
+            "feedback-id": "Feedback-ID: 127:account-notifier",
+            "gmsai": "gmsai: true",
+            "x-notifications": "X-Notifications: f6e4cd8c58660000",
+            "x-notifications-bounce-info": "X-Notifications-Bounce-Info: Ae2mSnzmgcSYMOfS_Mglw-ifm23hXwqc7jbx9dYudE3hnqmgdxw8j-Dbc0I4IiUYFGQ1AffTijWzk44m5V0395dRuaYN9afQ-JRyxtHv5vX1VE-JPYfhMjLbMevK73PF-gtM19ix9_mDJvpJ7pxrOsMZlPRAw7k01pZUcym9bOYywYoEXLRruHQO_1NEjUEaxyZNLnkzXzE6GRBaaEDoKkVPwRubXlc5Tpn6RGFk2bgNjAwNjA0MDQxNTM1NTk2OTMzMg",
+            "message-id": "Message-ID: <6-BUC2erjleGwJtr3o7cJQ@notifications.google.com>",
+            "subject": "Subject: Security alert",
+            "from": "From: Google <no-reply@accounts.google.com>",
+            "to": "To: ghostspieces@gmail.com",
+            "content-type": "Content-Type: multipart/alternative; boundary=\"000000000000cc74dc064799d299\""
+          },
+          "html": "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"format-detection\" content=\"email=no\"/><meta name=\"format-detection\" content=\"date=no\"/><style nonce=\"B1MiKuStK37pQm9jUk29jA\">.awl a {color: #FFFFFF; text-decoration: none;} .abml a {color: #000000; font-family: Roboto-Medium,Helvetica,Arial,sans-serif; font-weight: bold; text-decoration: none;} .adgl a {color: rgba(0, 0, 0, 0.87); text-decoration: none;} .afal a {color: #b0b0b0; text-decoration: none;} @media screen and (min-width: 600px) {.v2sp {padding: 6px 30px 0px;} .v2rsp {padding: 0px 10px;}} @media screen and (min-width: 600px) {.mdv2rw {padding: 40px 40px;}} </style><link href=\"//fonts.googleapis.com/css?family=Google+Sans\" rel=\"stylesheet\" type=\"text/css\" nonce=\"B1MiKuStK37pQm9jUk29jA\"/></head><body style=\"margin: 0; padding: 0;\" bgcolor=\"#FFFFFF\"><table width=\"100%\" height=\"100%\" style=\"min-width: 348px;\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" lang=\"en\"><tr height=\"32\" style=\"height: 32px;\"><td></td></tr><tr align=\"center\"><td><div itemscope itemtype=\"//schema.org/EmailMessage\"><div itemprop=\"action\" itemscope itemtype=\"//schema.org/ViewAction\"><link itemprop=\"url\" href=\"https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&amp;continue=https://myaccount.google.com/alert/nt/1767575851000?rfn%3D127%26rfnc%3D1%26eid%3D1377290915298581979%26et%3D0\"/><meta itemprop=\"name\" content=\"Review Activity\"/></div></div><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"padding-bottom: 20px; max-width: 516px; min-width: 220px;\"><tr><td width=\"8\" style=\"width: 8px;\"></td><td><div style=\"border-style: solid; border-width: thin; border-color:#dadce0; border-radius: 8px; padding: 40px 20px;\" align=\"center\" class=\"mdv2rw\"><img src=\"https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_74x24dp.png\" width=\"74\" height=\"24\" aria-hidden=\"true\" style=\"margin-bottom: 16px;\" alt=\"Google\"><div style=\"font-family: &#39;Google Sans&#39;,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;border-bottom: thin solid #dadce0; color: rgba(0,0,0,0.87); line-height: 32px; padding-bottom: 24px;text-align: center; word-break: break-word;\"><div style=\"font-size: 24px;\">You allowed n8n-local access to some of your Google Account data </div><table align=\"center\" style=\"margin-top:8px;\"><tr style=\"line-height: normal;\"><td align=\"right\" style=\"padding-right:8px;\"><img width=\"20\" height=\"20\" style=\"width: 20px; height: 20px; vertical-align: sub; border-radius: 50%;;\" src=\"https://lh3.googleusercontent.com/a/ACg8ocLw7O40eNBgOcpRNKtUmaRNLj-5R2f72o_xtP7DttxdMQBfdSsA=s96-c\" alt=\"\"></td><td><a style=\"font-family: &#39;Google Sans&#39;,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.87); font-size: 14px; line-height: 20px;\">ghostspieces@gmail.com</a></td></tr></table> </div><div style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif; font-size: 14px; color: rgba(0,0,0,0.87); line-height: 20px;padding-top: 20px; text-align: left;\"><br><p>If you didn’t allow n8n-local access to some of your Google Account data, someone else may be trying to access your Google Account data.</p><p>Take a moment now to check your account activity and secure your account.</p><div style=\"padding-top: 32px; text-align: center;\"><a href=\"https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&amp;continue=https://myaccount.google.com/alert/nt/1767575851000?rfn%3D127%26rfnc%3D1%26eid%3D1377290915298581979%26et%3D0\" target=\"_blank\" link-id=\"main-button-link\" style=\"font-family: &#39;Google Sans Flex&#39;,&#39;Google Sans Text&#39;,&#39;Google Sans&#39;,&#39;Noto Sans&#39;,Arial,Helvetica,sans-serif; line-height: 16px; color: #ffffff; font-weight: 500; text-decoration: none; font-size: 14px;display:inline-block;padding: 12px 24px;background-color: #0b57d0; border-radius: 9999px; min-width: 64px;\">Check activity</a></div><div style=\"padding-top: 40px;\"><div style=\"border-bottom: thin solid #dadce0; padding-bottom: 24px;\">To make changes at any time to the access that n8n-local has to your data, go to your <a href=\"https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&amp;continue=https://myaccount.google.com/connections/overview/ARxY5h9wrnQNMdAhF3nrbM65YULTR8Pj-TcVm5Su6m9jrPu8PMbjhCRMcGYe-QsyNDAGivOu_ILAXy_FJpgPO6gk4w?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue\" style=\"text-decoration: none; color: #4285F4;\" target=\"_blank\">Google Account</a></div></div></div><div style=\"padding-top: 20px; font-size: 12px; line-height: 16px; color: #5f6368; letter-spacing: 0.3px; text-align: center\">You can also see security activity at<br><a href=\"https://myaccount.google.com/notifications\" style=\"text-decoration: none; color: #4285F4;\" target=\"_blank\">https://myaccount.google.com/notifications</a></div></div><div style=\"text-align: left;\"><div style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.54); font-size: 11px; line-height: 18px; padding-top: 12px; text-align: center;\"><div>You received this email to let you know about important changes to your Google Account and services.</div><div style=\"direction: ltr;\">&copy; 2025 Google LLC, <a class=\"afal\" style=\"font-family: Roboto-Regular,Helvetica,Arial,sans-serif;color: rgba(0,0,0,0.54); font-size: 11px; line-height: 18px; padding-top: 12px; text-align: center;\">1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</a></div></div></div></td><td width=\"8\" style=\"width: 8px;\"></td></tr></table></td></tr><tr height=\"32\" style=\"height: 32px;\"><td></td></tr></table></body></html>",
+          "text": "[image: Google]\nYou allowed n8n-local access to some of your Google Account data\n\n\nghostspieces@gmail.com\n\nIf you didn’t allow n8n-local access to some of your Google Account data,\nsomeone else may be trying to access your Google Account data.\n\nTake a moment now to check your account activity and secure your account.\nCheck activity\n<https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/alert/nt/1767575851000?rfn%3D127%26rfnc%3D1%26eid%3D1377290915298581979%26et%3D0>\nTo make changes at any time to the access that n8n-local has to your data,\ngo to your Google Account\n<https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/connections/overview/ARxY5h9wrnQNMdAhF3nrbM65YULTR8Pj-TcVm5Su6m9jrPu8PMbjhCRMcGYe-QsyNDAGivOu_ILAXy_FJpgPO6gk4w?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue>\nYou can also see security activity at\nhttps://myaccount.google.com/notifications\nYou received this email to let you know about important changes to your\nGoogle Account and services.\n© 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA\n",
+          "textAsHtml": "<p>[image: Google]<br/>You allowed n8n-local access to some of your Google Account data</p><p><a href=\"mailto:ghostspieces@gmail.com\">ghostspieces@gmail.com</a></p><p>If you didn&rsquo;t allow n8n-local access to some of your Google Account data,<br/>someone else may be trying to access your Google Account data.</p><p>Take a moment now to check your account activity and secure your account.<br/>Check activity<br/>&lt;<a href=\"https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/alert/nt/1767575851000?rfn%3D127%26rfnc%3D1%26eid%3D1377290915298581979%26et%3D0\">https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/alert/nt/1767575851000?rfn%3D127%26rfnc%3D1%26eid%3D1377290915298581979%26et%3D0</a>&gt;<br/>To make changes at any time to the access that n8n-local has to your data,<br/>go to your Google Account<br/>&lt;<a href=\"https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/connections/overview/ARxY5h9wrnQNMdAhF3nrbM65YULTR8Pj-TcVm5Su6m9jrPu8PMbjhCRMcGYe-QsyNDAGivOu_ILAXy_FJpgPO6gk4w?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue\">https://accounts.google.com/AccountChooser?Email=ghostspieces@gmail.com&continue=https://myaccount.google.com/connections/overview/ARxY5h9wrnQNMdAhF3nrbM65YULTR8Pj-TcVm5Su6m9jrPu8PMbjhCRMcGYe-QsyNDAGivOu_ILAXy_FJpgPO6gk4w?utm_source%3Dsec_alert%26utm_medium%3Demail_notification%26force_all%3Dtrue</a>&gt;<br/>You can also see security activity at<br/><a href=\"https://myaccount.google.com/notifications\">https://myaccount.google.com/notifications</a><br/>You received this email to let you know about important changes to your<br/>Google Account and services.<br/>&copy; 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</p>",
+          "subject": "Security alert",
+          "date": "2026-01-05T01:17:31.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "ghostspieces@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:ghostspieces@gmail.com\" class=\"mp_address_email\">ghostspieces@gmail.com</a></span>",
+            "text": "ghostspieces@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "no-reply@accounts.google.com",
+                "name": "Google"
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Google</span> &lt;<a href=\"mailto:no-reply@accounts.google.com\" class=\"mp_address_email\">no-reply@accounts.google.com</a>&gt;</span>",
+            "text": "\"Google\" <no-reply@accounts.google.com>"
+          },
+          "messageId": "<6-BUC2erjleGwJtr3o7cJQ@notifications.google.com>"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Evaluation - Customer Support1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evaluation - Finance/Billing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evaluation - High Priority1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evaluation - Promotion1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evaluation - Unknown1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When fetching a dataset row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model - gpt-4.1-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Promotion": {
+      "main": [
+        [
+          {
+            "node": "Merge - actual_label",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Set High Priority": {
+      "main": [
+        [
+          {
+            "node": "Merge - actual_label",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Set Finance/Billing": {
+      "main": [
+        [
+          {
+            "node": "Merge - actual_label",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set Customer Support": {
+      "main": [
+        [
+          {
+            "node": "Merge - actual_label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Unknown": {
+      "main": [
+        [
+          {
+            "node": "Merge - actual_label",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge - actual_label": {
+      "main": [
+        [
+          {
+            "node": "Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Evaluation2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation - Customer Support1": {
+      "main": [
+        [
+          {
+            "node": "Set Customer Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation - Finance/Billing1": {
+      "main": [
+        [
+          {
+            "node": "Set Finance/Billing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation - Unknown1": {
+      "main": [
+        [
+          {
+            "node": "Set Unknown",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation - Promotion1": {
+      "main": [
+        [
+          {
+            "node": "Set Promotion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation - High Priority1": {
+      "main": [
+        [
+          {
+            "node": "Set High Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation2": {
+      "main": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create DataSet": {
+      "main": [
+        [
+          {
+            "node": "Convert to CSV for Datatable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "2b4e3069-4608-45ce-b230-f5ffe8d87f76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "483b8951d7e3c6bc2c2ba2ce55148fd5f0879d95bf4f7bdc6e5df3307b3aece5"
+  },
+  "id": "3aL6Zg3VFinv7Nd5",
+  "tags": []
+}
