@@ -1,0 +1,20 @@
+I need to install and run n8n's benchmarking tool on my Mac.
+
+EXISTING SETUP:
+- n8n already running at http://localhost:5678 (Docker Compose)
+- Docker Compose file: ~/Development/n8n-compose/docker-compose.yml
+- Login: your@email.com / yourpassword
+
+STEPS:
+1. Check if I have Node.js 18.10+ and pnpm installed
+2. Clone the n8n repository to ~/n8n-benchmark
+3. Navigate to packages/@n8n/benchmark
+4. Install dependencies with pnpm install
+5. Build the benchmark tool with pnpm build
+6. List the available benchmark scenarios
+7. Run the single-webhook scenario against my EXISTING n8n instance
+   - Test with 2, 20, and 50 concurrent connections (30s each)
+8. Show results and explain what each metric means
+9. Recommend performance optimizations based on results
+
+Document each step. Report any issues in ALL CAPS.
