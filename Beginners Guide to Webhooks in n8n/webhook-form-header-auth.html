@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Webhook Form - Header Auth</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 40px;
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      color: #1a1a2e;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      color: #666;
+      margin: 0 0 30px 0;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .auth-section {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e1e5e9;
+    }
+
+    .auth-section h4 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .auth-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .auth-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #ff6d5a;
+      box-shadow: 0 0 0 3px rgba(255, 109, 90, 0.1);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #ff6d5a 0%, #ff4757 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .response-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e1e5e9;
+    }
+
+    .response-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .response-header h3 {
+      margin: 0;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    #response-output {
+      background: #f8f9fa;
+      border: 1px solid #e1e5e9;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #333;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 0;
+    }
+
+    .webhook-url {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .webhook-url label {
+      margin-bottom: 4px;
+      color: #666;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .webhook-url input {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      padding: 8px 12px;
+      background: white;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>n8n Webhook Form</h1>
+    <p class="subtitle">Send data to your n8n workflow with Header Authentication</p>
+
+    <form id="webhook-form">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="Enter a title" required>
+      </div>
+
+      <div class="form-group">
+        <label for="body">Body</label>
+        <textarea id="body" name="body" placeholder="Enter your message..." required></textarea>
+      </div>
+
+      <button type="submit" id="submit-btn">Trigger Workflow</button>
+    </form>
+
+    <div class="response-section">
+      <div class="response-header">
+        <h3>Response</h3>
+        <span id="status-badge" class="status-badge" style="display: none;"></span>
+      </div>
+      <pre id="response-output">Waiting for submission...</pre>
+    </div>
+
+    <div class="webhook-url">
+      <label for="webhook-url-input">Webhook URL</label>
+      <input type="text" id="webhook-url-input" placeholder="Enter your n8n Webhook">
+    </div>
+
+    <div class="auth-section">
+      <h4>Header Authentication (Optional)</h4>
+      <div class="auth-row">
+        <div class="form-group">
+          <label for="header-name">Header Name</label>
+          <input type="text" id="header-name" placeholder="X-API-Key">
+          <div class="hint">e.g., X-API-Key, Authorization</div>
+        </div>
+        <div class="form-group">
+          <label for="header-value">Header Value</label>
+          <input type="password" id="header-value" placeholder="Your API key or token">
+          <div class="hint">e.g., my-secret-key, Bearer token123</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('webhook-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const output = document.getElementById('response-output');
+    const statusBadge = document.getElementById('status-badge');
+    const webhookUrlInput = document.getElementById('webhook-url-input');
+    const headerName = document.getElementById('header-name');
+    const headerValue = document.getElementById('header-value');
+
+    function setStatus(type, text) {
+      statusBadge.style.display = 'inline-block';
+      statusBadge.className = 'status-badge ' + type;
+      statusBadge.textContent = text;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const title = document.getElementById('title').value;
+      const body = document.getElementById('body').value;
+      const webhookUrl = webhookUrlInput.value;
+      const authHeaderName = headerName.value.trim();
+      const authHeaderValue = headerValue.value;
+
+      // Update UI
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      setStatus('pending', 'Sending...');
+      output.textContent = 'Sending request to n8n...';
+
+      try {
+        // Build headers
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+
+        // Add custom header auth if both name and value are provided
+        if (authHeaderName && authHeaderValue) {
+          headers[authHeaderName] = authHeaderValue;
+        }
+
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            email: email,
+            title: title,
+            body: body,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        const responseText = await response.text();
+
+        // Try to parse as JSON for pretty printing
+        let formattedResponse;
+        try {
+          const jsonResponse = JSON.parse(responseText);
+          formattedResponse = JSON.stringify(jsonResponse, null, 2);
+        } catch {
+          formattedResponse = responseText;
+        }
+
+        if (response.ok) {
+          setStatus('success', `Status: ${response.status}`);
+          output.textContent = formattedResponse || '(Empty response)';
+        } else {
+          setStatus('error', `Status: ${response.status}`);
+          output.textContent = `Error ${response.status}\n\n${formattedResponse}`;
+        }
+
+      } catch (error) {
+        setStatus('error', 'Failed');
+        output.textContent = `Request failed:\n\n${error.message}\n\nMake sure:\n1. n8n is running on the specified URL\n2. The webhook is listening (click "Listen for test event" in n8n)\n3. CORS is not blocking the request`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Trigger Workflow';
+      }
+    });
+  </script>
+</body>
+</html>
